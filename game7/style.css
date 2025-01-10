@@ -1,0 +1,128 @@
+body {
+    font-family: 'Roboto', Arial, sans-serif; /* A clean and modern font */
+    background: linear-gradient(120deg, #1a2a6c, #b21f1f, #fdbb2d);
+    margin: 0;
+    padding: 0;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+    background-size: 200% 200%; /* Subtle gradient animation */
+    animation: gradient-animation 8s ease infinite;
+}
+
+@keyframes gradient-animation {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+h1.results {
+    font-size: 2.5rem;
+    margin: 20px 0;
+    text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.7);
+    letter-spacing: 2px;
+    color: #ffeb3b;
+    animation: text-glow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes text-glow {
+    0% {
+        text-shadow: 0 0 10px #ffeb3b, 0 0 20px #ffeb3b, 0 0 30px #ffeb3b;
+    }
+    100% {
+        text-shadow: 0 0 20px #ffc107, 0 0 30px #ffc107, 0 0 40px #ffc107;
+    }
+}
+
+.grid {
+    width: 300px;
+    height: 300px;
+    border: 4px solid rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-wrap: wrap;
+    background-color: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.grid div {
+    width: 20px;
+    height: 20px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.invader {
+    background-color: #ff5252;
+    border-radius: 15%;
+    animation: invader-animation 1.2s infinite alternate ease-in-out;
+    box-shadow: 0 0 10px #ff5252, 0 0 20px rgba(255, 82, 82, 0.5);
+}
+
+@keyframes invader-animation {
+    0% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(1.2);
+    }
+}
+
+.shooter {
+    background-color: #4caf50;
+    border-radius: 50%;
+    animation: shooter-animation 0.8s infinite alternate ease-in-out;
+    box-shadow: 0 0 10px #4caf50, 0 0 20px rgba(76, 175, 80, 0.5);
+}
+
+@keyframes shooter-animation {
+    0% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(1.15);
+    }
+}
+
+.laser {
+    background-color: #ffc107;
+    animation: laser-animation 0.3s infinite alternate;
+    box-shadow: 0 0 10px #ffc107, 0 0 20px rgba(255, 193, 7, 0.5);
+}
+
+@keyframes laser-animation {
+    0% {
+        transform: scaleY(1);
+    }
+    100% {
+        transform: scaleY(0.8);
+    }
+}
+
+.boom {
+    background-color: #ff1744;
+    animation: boom-animation 0.5s ease-out;
+    box-shadow: 0 0 15px #ff1744, 0 0 25px rgba(255, 23, 68, 0.7);
+    border-radius: 50%;
+}
+
+@keyframes boom-animation {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
