@@ -2,6 +2,9 @@ const grid = document.querySelector('.grid');
 const frog = document.querySelector('.frog');
 const startPauseBtn = document.getElementById('start-pause');
 const timerDisplay = document.getElementById('timer');
+const overlay = document.getElementById('game-overlay');
+const message = document.getElementById('message');
+const restartBtn = document.getElementById('restart');
 
 let cars = [];
 let logs = [];
@@ -10,98 +13,130 @@ let countdown;
 let timeLeft = 30;
 let isGameRunning = false;
 
-// Initialize positions
+const step = 40;
+let frogX = 185;
+let frogY = 370;
+
+const resetFrog = () => {
+  frogX = 185;
+  frogY = 370;
+  frog.style.left = `${frogX}px`;
+  frog.style.top = `${frogY}px`;
+};
+
 const moveFrog = (e) => {
-    const step = 40; // Movement step size
-    const frogRect = frog.getBoundingClientRect();
-    const gridRect = grid.getBoundingClientRect();
+  if (!isGameRunning) return;
+  if (e.key === 'ArrowUp' && frogY > 0) frogY -= step;
+  if (e.key === 'ArrowDown' && frogY < 370) frogY += step;
+  if (e.key === 'ArrowLeft' && frogX > 0) frogX -= step;
+  if (e.key === 'ArrowRight' && frogX < 370) frogX += step;
 
-    if (e.key === 'ArrowUp' && frogRect.top > gridRect.top) frog.style.top = `${frog.offsetTop - step}px`;
-    if (e.key === 'ArrowDown' && frogRect.bottom < gridRect.bottom) frog.style.top = `${frog.offsetTop + step}px`;
-    if (e.key === 'ArrowLeft' && frogRect.left > gridRect.left) frog.style.left = `${frog.offsetLeft - step}px`;
-    if (e.key === 'ArrowRight' && frogRect.right < gridRect.right) frog.style.left = `${frog.offsetLeft + step}px`;
+  frog.style.left = `${frogX}px`;
+  frog.style.top = `${frogY}px`;
 };
 
-// Add cars and logs to the grid
 const createCarsAndLogs = () => {
-    for (let i = 0; i < 5; i++) {
-        const car = document.createElement('div');
-        car.classList.add('car');
-        car.style.top = `${i * 80}px`;
-        car.style.left = `${Math.random() * 400}px`;
-        grid.appendChild(car);
-        cars.push(car);
+  cars.forEach(car => car.remove());
+  logs.forEach(log => log.remove());
+  cars = [];
+  logs = [];
 
-        const log = document.createElement('div');
-        log.classList.add('log');
-        log.style.top = `${i * 80 + 40}px`;
-        log.style.left = `${Math.random() * 400}px`;
-        grid.appendChild(log);
-        logs.push(log);
-    }
+  for (let i = 0; i < 5; i++) {
+    const car = document.createElement('div');
+    car.classList.add('car');
+    car.style.top = `${i * 80}px`;
+    car.style.left = `${Math.random() * 360}px`;
+    grid.appendChild(car);
+    cars.push(car);
+
+    const log = document.createElement('div');
+    log.classList.add('log');
+    log.style.top = `${i * 80 + 40}px`;
+    log.style.left = `${Math.random() * 360}px`;
+    grid.appendChild(log);
+    logs.push(log);
+  }
 };
 
-// Move cars and logs
 const moveElements = () => {
-    cars.forEach(car => {
-        car.style.left = `${(parseFloat(car.style.left) - 2 + 400) % 400}px`;
-    });
+  cars.forEach(car => {
+    let left = parseFloat(car.style.left);
+    car.style.left = `${(left - 2 + 400) % 400}px`;
+  });
 
-    logs.forEach(log => {
-        log.style.left = `${(parseFloat(log.style.left) + 2) % 400}px`;
-    });
+  logs.forEach(log => {
+    let left = parseFloat(log.style.left);
+    log.style.left = `${(left + 2) % 400}px`;
+  });
 };
 
-// Check win or lose conditions
 const checkWinLose = () => {
-    const frogRect = frog.getBoundingClientRect();
+  const frogRect = frog.getBoundingClientRect();
 
-    if (frog.offsetTop === 0) {
-        clearInterval(gameInterval);
-        clearInterval(countdown);
-        alert('You Win!');
+  // Win
+  if (frogY <= 0) {
+    endGame("🎉 You Win!");
+  }
+
+  // Collision detection
+  for (let car of cars) {
+    const carRect = car.getBoundingClientRect();
+    if (
+      frogRect.left < carRect.right &&
+      frogRect.right > carRect.left &&
+      frogRect.top < carRect.bottom &&
+      frogRect.bottom > carRect.top
+    ) {
+      endGame("💥 Game Over! You hit a car.");
     }
-
-    cars.forEach(car => {
-        const carRect = car.getBoundingClientRect();
-        if (frogRect.left < carRect.right && frogRect.right > carRect.left &&
-            frogRect.top < carRect.bottom && frogRect.bottom > carRect.top) {
-            clearInterval(gameInterval);
-            clearInterval(countdown);
-            alert('Game Over! You hit a car.');
-        }
-    });
+  }
 };
 
-// Timer
 const startTimer = () => {
-    countdown = setInterval(() => {
-        timeLeft--;
-        timerDisplay.textContent = timeLeft;
+  countdown = setInterval(() => {
+    timeLeft--;
+    timerDisplay.textContent = timeLeft;
 
-        if (timeLeft <= 0) {
-            clearInterval(gameInterval);
-            clearInterval(countdown);
-            alert('Game Over! Time’s up.');
-        }
-    }, 1000);
+    if (timeLeft <= 0) {
+      endGame("⏰ Game Over! Time’s up.");
+    }
+  }, 1000);
 };
 
-// Start/Pause Game
 const toggleGame = () => {
-    if (isGameRunning) {
-        clearInterval(gameInterval);
-        clearInterval(countdown);
-    } else {
-        gameInterval = setInterval(() => {
-            moveElements();
-            checkWinLose();
-        }, 50);
-        startTimer();
-    }
-    isGameRunning = !isGameRunning;
+  if (isGameRunning) {
+    clearInterval(gameInterval);
+    clearInterval(countdown);
+    startPauseBtn.textContent = 'Start';
+  } else {
+    resetFrog();
+    createCarsAndLogs();
+    gameInterval = setInterval(() => {
+      moveElements();
+      checkWinLose();
+    }, 50);
+    startTimer();
+    startPauseBtn.textContent = 'Pause';
+  }
+  isGameRunning = !isGameRunning;
+};
+
+const endGame = (text) => {
+  clearInterval(gameInterval);
+  clearInterval(countdown);
+  isGameRunning = false;
+  message.textContent = text;
+  overlay.classList.remove('hidden');
+  startPauseBtn.textContent = 'Start';
+};
+
+const restartGame = () => {
+  overlay.classList.add('hidden');
+  timeLeft = 30;
+  timerDisplay.textContent = timeLeft;
+  toggleGame();
 };
 
 document.addEventListener('keydown', moveFrog);
 startPauseBtn.addEventListener('click', toggleGame);
-createCarsAndLogs();
+restartBtn.addEventListener('click', restartGame);
