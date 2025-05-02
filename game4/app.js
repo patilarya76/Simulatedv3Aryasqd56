@@ -3,13 +3,13 @@ const scoreDisplay = document.querySelector('#score');
 const blockWidth = 100;
 const blockHeight = 20;
 const ballDiameter = 20;
-const boardWidth = 600;
-const boardHeight = 400;
+const boardWidth = 700;
+const boardHeight = 500;
 let xDirection = 2;
 let yDirection = -2;
 
-let currentPosition = [250, 10];
-let ballCurrentPosition = [290, 60];
+let currentPosition = [290, 10]; // Paddle position
+let ballCurrentPosition = [340, 60]; // Ball start position
 let timerId;
 let score = 0;
 
@@ -26,7 +26,7 @@ class Block {
 // All blocks
 const blocks = [];
 for (let y = 300; y >= 220; y -= 40) {
-    for (let x = 10; x <= 490; x += 110) {
+    for (let x = 10; x <= 580; x += 110) {
         blocks.push(new Block(x, y));
     }
 }
@@ -55,16 +55,7 @@ ball.classList.add('ball');
 grid.appendChild(ball);
 drawBall();
 
-// Move user
-function moveUser(e) {
-    if (e.key === 'ArrowLeft' && currentPosition[0] > 0) {
-        currentPosition[0] -= 15;
-    } else if (e.key === 'ArrowRight' && currentPosition[0] < boardWidth - blockWidth) {
-        currentPosition[0] += 15;
-    }
-    drawUser();
-}
-
+// Draw user paddle
 function drawUser() {
     user.style.left = currentPosition[0] + 'px';
     user.style.bottom = currentPosition[1] + 'px';
@@ -76,6 +67,17 @@ function drawBall() {
     ball.style.bottom = ballCurrentPosition[1] + 'px';
 }
 
+// Move user paddle
+function moveUser(e) {
+    if (e.key === 'ArrowLeft' && currentPosition[0] > 0) {
+        currentPosition[0] -= 15;
+    } else if (e.key === 'ArrowRight' && currentPosition[0] < boardWidth - blockWidth) {
+        currentPosition[0] += 15;
+    }
+    drawUser();
+}
+document.addEventListener('keydown', moveUser);
+
 // Move ball
 function moveBall() {
     ballCurrentPosition[0] += xDirection;
@@ -85,7 +87,7 @@ function moveBall() {
 }
 timerId = setInterval(moveBall, 20);
 
-// Check collisions
+// Check for collisions
 function checkForCollisions() {
     // Block collision
     blocks.forEach((block, index) => {
@@ -118,17 +120,17 @@ function checkForCollisions() {
         yDirection *= -1;
     }
 
-    // User collision
+    // Paddle collision
     if (
         ballCurrentPosition[0] > currentPosition[0] &&
         ballCurrentPosition[0] < currentPosition[0] + blockWidth &&
         ballCurrentPosition[1] <= currentPosition[1] + blockHeight &&
-        ballCurrentPosition[1] > currentPosition[1]
+        ballCurrentPosition[1] >= currentPosition[1]
     ) {
         yDirection *= -1;
     }
 
-    // Game over
+    // Game Over
     if (ballCurrentPosition[1] <= 0) {
         clearInterval(timerId);
         scoreDisplay.textContent = 'Game Over!';
@@ -148,5 +150,3 @@ function changeDirection() {
         xDirection = 2;
     }
 }
-
-document.addEventListener('keydown', moveUser);
